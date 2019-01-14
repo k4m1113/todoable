@@ -1,33 +1,44 @@
 require 'net/http'
-require 'time'
+require 'json'
 
 class Todoable::Auth
   def initialize
-    uri = URI('http://todoable.teachable.tech/api/authenticate')
-    file = File.stat 'authenticate'
+    return unless Todoable::Auth.stale?
+    # define request to Teachable API authentication endpoint
+    url = 'http://todoable.teachable.tech/api/authenticate'
+    uri = URI(url)
     req = Net::HTTP::Post.new(uri)
+
+    # set headers for request to Teachable API
     req.basic_auth 'kamilledelgardo@gmail.com', 'todoable'
-    req['If-Modified-Since'] = file.mtime.rfc2822
     req['Content-Type'] = "application/json"
     req['Accept'] = "application/json"
 
+    # send credential request
+    begin
     res = Net::HTTP.start(uri.hostname, uri.port) {|http|
       http.request(req)
     }
+    rescue
+      puts 'request error'
+    end
 
-    open 'authenticate', 'w' do |io|
-      io.write res.body
-    end if res.is_a?(Net::HTTPSuccess)
-
+    # write response to file 'authenticate'
+    f = open 'authenticate', 'w'
+    begin
+      res_hash = JSON.parse(res.body)
+    rescue
+      puts 'response error'
+    else
+      f.write "#{res_hash['expires_at']},#{res_hash['token']}"
+    ensure
+      f.close unless f.nil?
+    end
   end
 
-  def refresh
-
-  end
-
-  def stale?
-    contents = File.open("../../.token", "r") { |file| file.read }
-    timestamp = contents.split(",")[0];
-    timestamp > Time.now.to_f
+  def self.stale?
+    contents = File.read "authenticate"
+    expiry = Time.parse(contents.split(',')[0])
+    expiry < Time.now
   end
 end
