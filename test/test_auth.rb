@@ -7,5 +7,5 @@ class AuthTest < Minitest::Test
 #   PARAMETERS: none
 #   RETURNS: none
 #-------------------------------------------------------------------------------
-
+  
 end
