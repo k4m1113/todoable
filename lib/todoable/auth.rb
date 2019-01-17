@@ -37,8 +37,13 @@ class Todoable::Auth
   end
 
   def self.stale?
-    contents = File.read "authenticate"
-    expiry = Time.parse(contents.split(',')[0])
-    expiry < Time.now
+    begin
+      contents = File.read "authenticate"
+      expiry = Time.parse(contents.split(',')[0])
+    rescue Errno::ENOENT, NoMethodError # file nonexistent or empty
+      return true
+    else
+      expiry < Time.now
+    end
   end
 end
