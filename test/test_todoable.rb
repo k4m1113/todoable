@@ -1,6 +1,6 @@
 require "minitest/autorun"
 require "todoable"
 
-class TodoableTest < Minitest::Test
+class TodoableTest < MiniTest::Unit::TestCase
 
 end

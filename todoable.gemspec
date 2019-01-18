@@ -2,6 +2,7 @@ Gem::Specification.new do |s|
   s.name        = 'todoable'
   s.version     = '0.1.0'
   s.license     = 'MIT'
+  s.homepage    = "http://none.com/none"
   s.summary     = "Todo list creator and editor"
   s.description = "Todo items as a service. Just for you. We are in closed beta."
   s.author      = "Kamille Delgardo"

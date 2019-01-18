@@ -1,3 +1,4 @@
+# Auth factory for Teachable Todoable API
 require 'net/http'
 require 'json'
 
@@ -36,6 +37,7 @@ class Todoable::Auth
     end
   end
 
+  # check auth expiry is greater than Time.now
   def self.stale?
     begin
       contents = File.read "authenticate"
@@ -43,7 +45,18 @@ class Todoable::Auth
     rescue Errno::ENOENT, NoMethodError # file nonexistent or empty
       return true
     else
-      expiry < Time.now
+      expiry < Time.now # should I add a few milliseconds in case it expires in the time btween checking and the CRUD task is being performed?
+    end
+  end
+
+  # return current token for API call
+  def self.curr_token
+    begin
+      contents = File.read "authenticate"
+    rescue Errno::ENOENT, NoMethodError # file nonexistent or empty
+      return "please check that file 'authorization' exists"
+    else
+      return contents.split(',')[1]
     end
   end
 end
